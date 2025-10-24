@@ -3,7 +3,7 @@ mod movement;
 
 use bevy::prelude::*;
 
-use crate::MacroState;
+use crate::{MacroState, attractable::HP};
 
 pub struct PlayerPlugin;
 
@@ -50,11 +50,12 @@ pub fn player_spawn(mut commands: Commands, pl_res: Res<PlayerResource>) {
             Player { angle: 0. },
             Transform::from_xyz(0., 0., 0.),
             Sprite::from_image(pl_res.player.clone()),
+            HP::new(100),
         ))
         .with_child((
             GameCube,
             Transform::from_xyz(0., 0., 0.),
             Sprite::from_image(pl_res.gc.clone()),
-        ));
-    commands.spawn(Camera2d);
+        ))
+        .with_child(Camera2d);
 }

@@ -1,11 +1,15 @@
-mod follow_player;
-mod player_detection;
+mod attack;
+mod movement;
 
 use bevy::prelude::*;
+use rand::Rng;
 
-use crate::enemy::{
-    follow_player::{FollowPlayer, follow_closest_player},
-    player_detection::{PlayerDetectPlugin, Vision},
+use crate::{
+    attractable::HP,
+    enemy::{
+        attack::{MeleeAttack, attacking_animation, melee_attack},
+        movement::{FollowPlayer, follow_closest_player, leave_from_other_enemy},
+    },
 };
 
 #[derive(Component)]
@@ -16,8 +20,15 @@ impl Plugin for EnemyPlugin {
         app.init_resource::<EnemyResource>()
             .add_systems(Startup, init_resource)
             .add_systems(PostStartup, spawn_enemy)
-            .add_systems(Update, follow_closest_player)
-            .add_plugins(PlayerDetectPlugin);
+            .add_systems(
+                Update,
+                (
+                    follow_closest_player,
+                    leave_from_other_enemy,
+                    melee_attack,
+                    attacking_animation,
+                ),
+            );
     }
 }
 
@@ -39,18 +50,31 @@ pub fn init_resource(mut res: ResMut<EnemyResource>, asset_server: Res<AssetServ
 #[derive(Component)]
 struct Enemy {
     pub size_radius: f32,
-    pub found_player: Vec<Entity>,
+}
+
+#[derive(Component)]
+struct Vision {
+    vision: f32,
 }
 
 fn spawn_almican(commands: &mut Commands, enemy_res: &Res<EnemyResource>) {
+    let mut rng = rand::rng();
     commands.spawn((
-        // Enemy {
-        //     size_radius: 64.,
-        //     found_player: Vec::new(),
-        // },
-        // Vision { vision: 320. },
-        // FollowPlayer { speed: 80. },
+        Enemy { size_radius: 64. },
+        Vision { vision: 320. },
+        FollowPlayer { speed: 80. },
         Sprite::from_image(enemy_res.almican.clone()),
-        Transform::from_xyz(0., 0., 0.),
+        Transform::from_xyz(
+            rng.random_range((-300.)..(300.)),
+            rng.random_range((-300.)..(300.)),
+            0.,
+        ),
+        HP::new(20),
+        MeleeAttack {
+            max_duration: 1.,
+            duration: 1.,
+            range: 128.,
+            attack_power: 5,
+        },
     ));
 }

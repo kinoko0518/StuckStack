@@ -1,10 +1,11 @@
+mod attractable;
 mod enemy;
 mod player;
 
 use bevy::prelude::*;
 use bevy_embedded_assets::EmbeddedAssetPlugin;
 
-use crate::{enemy::EnemyPlugin, player::PlayerPlugin};
+use crate::{attractable::AttractablePlugin, enemy::EnemyPlugin, player::PlayerPlugin};
 
 #[derive(States, Default, Debug, Clone, Copy, Hash, PartialEq, Eq)]
 pub enum MacroState {
@@ -21,5 +22,6 @@ fn main() {
         .init_state::<MacroState>()
         .add_plugins(PlayerPlugin)
         .add_plugins(EnemyPlugin)
+        .add_plugins(AttractablePlugin)
         .run();
 }

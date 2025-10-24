@@ -2160,6 +2160,7 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "bevy_embedded_assets",
+ "rand",
 ]
 
 [[package]]
